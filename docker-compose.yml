@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  ros2-dev:
+    image: ghcr.io/craigbuilds/hlcs-docker-builder:latest
+    container_name: ros2-dev
+    restart: unless-stopped
+    
+    # Mount workspace directory
+    volumes:
+      - ${WORKSPACE_PATH:-.}:/workspace
+      # Optional: Mount X11 socket for GUI applications (Linux hosts)
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    
+    # Environment variables for GUI support
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      # Allow X11 connections
+      - QT_X11_NO_MITSHM=1
+    
+    # Network mode for easy access to host services
+    network_mode: host
+    
+    # Keep container running
+    command: sleep infinity
+    
+    # Optional: Add capabilities if needed for specific hardware access
+    # cap_add:
+    #   - SYS_PTRACE
+    
+    # Optional: Device access for hardware interaction
+    # devices:
+    #   - /dev/dri:/dev/dri  # GPU access
