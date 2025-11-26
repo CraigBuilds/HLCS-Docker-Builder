@@ -71,13 +71,13 @@ sudo apt update && sudo apt install -y code
 code --user-data-dir /workspace/.vscode-data
 ```
 
-#### Using VSCode Remote - Containers Extension
+#### Using VSCode Dev Containers Extension
 
-The recommended way to use VSCode with this container is via the [Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers):
+The recommended way to use VSCode with this container is via the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers):
 
-1. Install the Remote - Containers extension in VSCode on your host machine
+1. Install the Dev Containers extension in VSCode on your host machine
 2. Start the container: `docker run -d --name ros2-dev -v $(pwd):/workspace ghcr.io/craigbuilds/hlcs-docker-builder:latest sleep infinity`
-3. In VSCode, press F1 and select "Remote-Containers: Attach to Running Container..."
+3. In VSCode, press F1 and select "Dev Containers: Attach to Running Container..."
 4. Select the `ros2-dev` container
 5. VSCode will connect to the container, giving you full IDE functionality
 
@@ -143,7 +143,7 @@ The workflow uses GitHub Actions cache for Docker layers, registry fallback for 
 
 #### VSCode Support
 - VSCode can be installed after container startup (see usage instructions)
-- Fully compatible with VSCode Remote - Containers extension
+- Fully compatible with VSCode Dev Containers extension
 - Pre-configured development environment ready for use
 
 #### Container Features

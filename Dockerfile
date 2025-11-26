@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 #   sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
 #   sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
 #   sudo apt update && sudo apt install code
-# Or use VSCode Remote-Containers extension from the host
+# Or use VSCode Dev Containers extension from the host
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-colcon-common-extensions \
@@ -47,7 +47,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python development tools
-# Note: In restricted network environments, these can be installed after container is running
+# Note: In restricted network environments, these installations may fail
+# In such cases, these packages can be installed after the container is running
+# The || true ensures the build continues even if pip packages fail to install
 RUN pip3 install --no-cache-dir \
     pytest \
     pylint \
@@ -55,7 +57,8 @@ RUN pip3 install --no-cache-dir \
     flake8 \
     mypy \
     ipython \
-    jupyter || true
+    jupyter 2>&1 | tee /tmp/pip-install.log || \
+    (echo "Warning: Some Python packages failed to install. See /tmp/pip-install.log for details." && true)
 
 # Create a non-root user for development
 ARG USERNAME=developer
