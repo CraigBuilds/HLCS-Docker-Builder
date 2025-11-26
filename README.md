@@ -38,10 +38,44 @@ docker run -it --rm -v $(pwd):/workspace ghcr.io/craigbuilds/hlcs-docker-builder
 
 #### Using as Development Environment on VMs
 
-To use this container as a persistent development environment on VMs:
+**Easy Setup with Helper Script:**
+
+Download the helper script and start the container:
 
 ```bash
-# Start the container in the background
+# Download the helper script
+curl -O https://raw.githubusercontent.com/CraigBuilds/HLCS-Docker-Builder/main/start-dev-container.sh
+chmod +x start-dev-container.sh
+
+# Start the container (uses current directory as workspace)
+./start-dev-container.sh
+
+# Or specify a workspace path
+./start-dev-container.sh /path/to/your/workspace
+```
+
+The script automatically:
+- Pulls the latest container image
+- Creates and starts the container with the correct configuration
+- Sets up auto-restart on VM reboot
+- Mounts your workspace directory
+
+**Enter the development environment:**
+
+```bash
+docker exec -it ros2-dev bash
+```
+
+**Run commands from the host:**
+
+```bash
+docker exec ros2-dev colcon build
+```
+
+**Manual Setup (if preferred):**
+
+```bash
+# Start the container
 docker run -d --name ros2-dev \
   --restart unless-stopped \
   -v /path/to/workspace:/workspace \
@@ -49,10 +83,8 @@ docker run -d --name ros2-dev \
   sleep infinity
 
 # Access the container
-docker exec -it ros2-dev /bin/bash
-
-# Run commands from the host
-docker exec ros2-dev colcon build
+docker exec -it ros2-dev bash
+```
 ```
 
 ### CI/CD
