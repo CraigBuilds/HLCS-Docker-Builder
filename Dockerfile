@@ -30,7 +30,7 @@ RUN mkdir -p /workspace
 WORKDIR /workspace
 
 # Source ROS2 setup in bashrc
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
 # Default command
 CMD ["/bin/bash"]
