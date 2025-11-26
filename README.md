@@ -44,7 +44,7 @@ The container is built and deployed on-demand via manual workflow dispatch. To t
 2. Click "Run workflow"
 3. Select the branch and run
 
-This optimized workflow uses aggressive caching and build optimizations for fast execution.
+The workflow uses GitHub Actions cache for Docker layers, registry fallback for image pulls, and builds images for a single platform to maximize speed.
 
 ### What's Included
 
