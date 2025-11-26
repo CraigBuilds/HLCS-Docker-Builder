@@ -1,6 +1,6 @@
 # HLCS-Docker-Builder
 
-This repository contains Docker containers for ROS2 development, built and deployed automatically via GitHub Actions.
+This repository contains Docker containers for ROS2 development, built and deployed on-demand via GitHub Actions.
 
 ## ROS2 Humble Container
 
@@ -10,7 +10,7 @@ A Docker container based on ROS2 Humble Desktop with common development tools.
 
 #### Pulling the Image
 
-The container is automatically built and pushed to GitHub Container Registry. You can pull it using:
+The container is built and pushed to GitHub Container Registry on-demand. You can pull it using:
 
 ```bash
 docker pull ghcr.io/craigbuilds/hlcs-docker-builder:latest
@@ -38,10 +38,13 @@ docker run -it --rm -v $(pwd):/workspace ghcr.io/craigbuilds/hlcs-docker-builder
 
 ### CI/CD
 
-The container is automatically built and deployed when:
-- Code is pushed to the main/master branch
-- Pull requests are created
-- Manual workflow dispatch is triggered
+The container is built and deployed on-demand via manual workflow dispatch. To trigger a build:
+
+1. Go to the [Actions tab](../../actions/workflows/build-and-deploy.yml)
+2. Click "Run workflow"
+3. Select the branch and run
+
+This optimized workflow uses aggressive caching and build optimizations for fast execution.
 
 ### What's Included
 
