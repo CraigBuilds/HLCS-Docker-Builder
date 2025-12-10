@@ -26,7 +26,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-          tags: hlcs-docker-test:latest
+          tags: my-ros2-container:latest
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -34,7 +34,7 @@ jobs:
       - name: Test ROS2 installation
         run: |
           echo "Testing ROS2 CLI..."
-          docker run --rm hlcs-docker-test:latest ros2 --help > /tmp/ros2_output.txt
+          docker run --rm my-ros2-container:latest ros2 --help > /tmp/ros2_output.txt
           
           # Check if ros2 --help produces expected output (check for 'usage:' which is more stable)
           if grep -qi "usage:" /tmp/ros2_output.txt && grep -q "ros2" /tmp/ros2_output.txt; then
@@ -48,7 +48,7 @@ jobs:
       - name: Test Python3 installation
         run: |
           echo "Testing Python3..."
-          docker run --rm hlcs-docker-test:latest python3 --version > /tmp/python_output.txt
+          docker run --rm my-ros2-container:latest python3 --version > /tmp/python_output.txt
           
           # Check if python3 is installed and outputs version
           if grep -q "Python 3" /tmp/python_output.txt; then
@@ -63,5 +63,5 @@ jobs:
       - name: Test container can run interactively
         run: |
           echo "Testing container can run and execute basic commands..."
-          docker run --rm hlcs-docker-test:latest bash -c "echo 'Container is running' && test -d /workspace && ls -la /workspace"
+          docker run --rm my-ros2-container:latest bash -c "echo 'Container is running' && test -d /workspace && ls -la /workspace"
           echo "✓ Container run test passed: Container can execute commands successfully"
