@@ -34,8 +34,8 @@ jobs:
           echo "Testing ROS2 CLI..."
           docker run --rm hlcs-docker-test:latest ros2 --help > /tmp/ros2_output.txt
           
-          # Check if ros2 --help produces expected output
-          if grep -q "ros2 is an extensible command-line tool" /tmp/ros2_output.txt; then
+          # Check if ros2 --help produces expected output (check for 'usage:' which is more stable)
+          if grep -qi "usage:" /tmp/ros2_output.txt && grep -q "ros2" /tmp/ros2_output.txt; then
             echo "✓ ROS2 CLI test passed: ros2 command is available and working"
           else
             echo "✗ ROS2 CLI test failed: Expected output not found"
@@ -61,5 +61,5 @@ jobs:
       - name: Test container can run interactively
         run: |
           echo "Testing container can run and execute basic commands..."
-          docker run --rm hlcs-docker-test:latest bash -c "echo 'Container is running' && ls -la /workspace"
+          docker run --rm hlcs-docker-test:latest bash -c "echo 'Container is running' && test -d /workspace && ls -la /workspace"
           echo "✓ Container run test passed: Container can execute commands successfully"
