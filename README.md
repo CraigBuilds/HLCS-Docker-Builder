@@ -6,20 +6,9 @@ This repository contains Docker containers for ROS2 development, built and deplo
 
 A Docker container based on ROS2 Humble Desktop with development tools and HLCS dependencies. 
 
-### Usage
+## Pulling and running the Image
 
-#### Pulling the Image
-
-The container is built and pushed to GitHub Container Registry on demand. You can pull it using:
-
-```bash
-docker pull ghcr.io/craigbuilds/hlcs-docker-builder:latest
-```
-
-#### Running the Container
-
-
-### CI/CD
+## CI/CD
 
 The container is built and deployed on-demand via manual workflow dispatch. To trigger a build:
 
@@ -29,9 +18,15 @@ The container is built and deployed on-demand via manual workflow dispatch. To t
 
 The workflow uses GitHub Actions cache for Docker layers, registry fallback for image pulls, and builds images for a single platform to maximise speed.
 
-### What's Included
+The container is also tested in a separate workflow. The tests ensure that after pulling the container, you can:
+ - Smoke test: run the ros2 cli tool, i.e `ros2 --help`
+ - Access env vars with `echo ROS_VERSION`
+ - Access Python with  `python -v`
+ 
+## What's Included
 
 - ROS2 Humble Desktop
+- The HLCS ROS2 Workspace
 - Python3 and pip
 - Colcon build tools
 - Git
@@ -45,10 +40,10 @@ The workflow uses GitHub Actions cache for Docker layers, registry fallback for 
 - Other ROS Tools
 - A Preconfigured ~/.bashrc
 
-### Building Locally
+## Building Locally
 
-To build the container locally:
+To build the container locally (not recommended unless you are developing the container):
 
 ```bash
-docker build -t hlcs-ros2-humble .
+#todo add instructions for cloning this repo and then building and running the container
 ```
