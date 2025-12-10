@@ -20,5 +20,13 @@ WORKDIR /workspace
 # Source ROS2 setup in bashrc
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
+# Add a host bootstrap script into the image. Developers can extract this script from the container and run it on the host machine to install host tools (e.g, VSCode and VSCode extensions)
+# Usage: 1) Run the container and extract the script
+# docker run --rm your.registry/ros2-dev:humble cat /opt/bootstrap/install_host_tools.sh > install_host_tools.sh
+# 2) Run the script
+# chmod +x install_host_tools.sh && ./install_host_tools.sh
+COPY scripts/install_host_tools.sh /opt/bootstrap/install_host_tools.sh
+RUN chmod +x /opt/bootstrap/install_host_tools.sh
+
 # Default command
 CMD ["/bin/bash"]
