@@ -1,10 +1,13 @@
-# 1) ROS2 Humble Docker Container.
+# ROS2 Humble Docker Container.
+# Uses: https://github.com/osrf/docker_images/blob/master/ros/humble/ubuntu/jammy/desktop/Dockerfile
+# Which itself uses https://github.com/osrf/docker_images/tree/master/ros/humble/ubuntu/jammy/ros-base/Dockerfile
+# Which itself  uses https://github.com/osrf/docker_images/blob/master/ros/humble/ubuntu/jammy/ros-core/Dockerfile
 FROM osrf/ros:humble-desktop
 
-# 2) Allow Debian/Ubuntu tools (like apt) to run in non-interactive mode.
+# Allow Debian/Ubuntu tools (like apt) to run in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 3) Update and install basic apt dependencies
+# Update and install basic apt dependencies (is this needed, or is this included in osrf/ros:humble-desktop?)
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-colcon-common-extensions \
