@@ -32,16 +32,19 @@ jobs:
         id: build-push
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          context: . # Sets the Docker build context to the current working directory (the repository root).
+          file: ./Dockerfile # Specifies the Dockerfile to use for the build
+          push: true # Push the built image to the registry instead of only building it locally
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest #Expands to ghcr.io/<owner>/<repo>:latest
+          # Build cache sources:
+          # type=gha tells buildx to use GitHub Actions cache as a source of cached build layers.
+          # type=registry,ref=... tells buildx to use layers from the already-pushed latest image (if it exists)
           cache-from: |
             type=gha
             type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,mode=max
-          cache-to: type=gha,mode=max
-          provenance: false
-          platforms: linux/amd64
+          cache-to: type=gha,mode=max # Store the build cache in the gha
+          provenance: false # Disables generation and upload of build provenance/attestations
+          platforms: linux/amd64 # Builds the image specifically for the linux/amd64 architecture (no multi-arch build).
 
       - name: Image digest
         run: echo "Image pushed with digest ${{ steps.build-push.outputs.digest }}"
