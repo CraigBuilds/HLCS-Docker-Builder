@@ -1,0 +1,95 @@
+#cloud-config
+# Ubuntu 24.04 Autoinstall Configuration (cloud-init)
+#
+# This file configures an automated, non-interactive Ubuntu installation.
+# It is served to the Ubuntu installer via Packer's HTTP server and consumed
+# by cloud-init's NoCloud datasource during the installation process.
+#
+# Reference: https://ubuntu.com/server/docs/install/autoinstall
+
+# Autoinstall version - must match the Ubuntu autoinstall schema version
+autoinstall:
+  # Version of the autoinstall configuration format
+  version: 1
+  
+  # Locale and keyboard configuration
+  locale: en_US.UTF-8  # System language and regional settings
+  keyboard:
+    layout: us  # US keyboard layout
+  
+  # Network configuration
+  # Use DHCP for automatic network configuration during installation
+  network:
+    network:
+      version: 2
+      ethernets:
+        # Match any network interface and configure it with DHCP
+        any:
+          match:
+            name: en*  # Match interfaces starting with 'en' (e.g., enp0s3)
+          dhcp4: true  # Enable DHCPv4 for automatic IP configuration
+  
+  # Storage configuration
+  # This sets up the disk partitioning scheme
+  storage:
+    layout:
+      # LVM layout provides flexibility for resizing partitions later
+      name: lvm
+  
+  # SSH server configuration
+  # CRITICAL: SSH must be installed and enabled for Packer to connect
+  # and run provisioning scripts after the OS installation completes
+  ssh:
+    # Install OpenSSH server package
+    install-server: true
+    # Allow password authentication (required for Packer SSH communicator)
+    # This can be disabled later if you prefer key-based auth only
+    allow-pw: true
+  
+  # User configuration
+  # Create a non-root user that Packer will use for provisioning
+  identity:
+    # Hostname for the VM
+    hostname: ubuntu-dev
+    # Username for the primary user
+    username: packer
+    # Password hash for the user (password: "packer")
+    # Generated using: mkpasswd -m sha-512 --rounds=4096
+    # In production, use a strong password or SSH keys instead
+    password: "$6$rounds=4096$SaltySalt$pZzsKDgUJWHqFSLf.Wh0EhRJpODkKPQKMmUqpPSNpM6SuHcA8xCeHN8/rU9tD3SyPRVyFCKLjSxHrHkQdqGcn1"
+    # Add user to sudo group for administrative tasks
+    # groups: [adm, sudo] creates user with sudo privileges
+  
+  # Package configuration
+  # Update all packages to latest versions after installation
+  packages:
+    update: true
+    upgrade: true
+  
+  # Additional packages to install during the base installation
+  # We install minimal packages here; Docker and VS Code will be installed
+  # by the Packer provisioning script for better control and documentation
+  packages:
+    - openssh-server  # Ensure SSH server is installed (should be included by ssh config)
+    - curl  # Utility for downloading files
+    - wget  # Alternative download utility
+    - git  # Version control system
+    - build-essential  # Basic compilation tools (gcc, make, etc.)
+  
+  # Late commands - run after installation completes but before first boot
+  # These commands run in the installer environment, not the installed system
+  late-commands:
+    # Add the packer user to the sudo group
+    # This allows the user to run commands with root privileges
+    - "curtin in-target --target=/target -- usermod -aG sudo packer"
+    
+    # Configure sudo to not require a password for the packer user
+    # This is needed for Packer provisioners to run sudo commands non-interactively
+    # SECURITY NOTE: In production, you may want to require passwords for sudo
+    - "echo 'packer ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/packer"
+    
+    # Set correct permissions on the sudoers file
+    - "chmod 0440 /target/etc/sudoers.d/packer"
+    
+    # Ensure SSH server will start on boot
+    - "curtin in-target --target=/target -- systemctl enable ssh"

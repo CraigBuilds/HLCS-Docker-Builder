@@ -1,0 +1,20 @@
+# Cloud-init meta-data file
+#
+# This file is part of the NoCloud datasource configuration for cloud-init.
+# It provides metadata about the instance to cloud-init during the Ubuntu
+# installation process.
+#
+# The NoCloud datasource allows cloud-init to read configuration from a local
+# source (in this case, Packer's HTTP server) without requiring a cloud provider.
+#
+# For a basic installation, this file can be empty, but it must exist.
+# cloud-init expects both user-data and meta-data files to be present.
+#
+# Optional fields that could be included here:
+# - instance-id: A unique identifier for this instance
+# - local-hostname: The hostname for the system
+#
+# We leave this empty because our user-data file already specifies the hostname
+# and other necessary configuration.
+
+# Empty meta-data - required to exist but can be empty for basic setups
