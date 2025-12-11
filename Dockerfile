@@ -18,7 +18,13 @@ RUN apt-get update && apt-get install -y \
     libdbus-1-3 \
     libegl1 \
     libfontconfig1
-# PySide6/Qt runtime dependencies: xvfb (virtual X server for headless GUI testing), libxcb-xinerama0 (X11 protocol C-language Binding for multi-monitor support), libxcb-cursor0 (X11 cursor management), libdbus-1-3 (D-Bus system for Qt IPC), libegl1 (OpenGL ES rendering), libfontconfig1 (font configuration and rendering)
+# PySide6/Qt runtime dependencies:
+# xvfb: Virtual X server for headless GUI testing
+# libxcb-xinerama0: X11 protocol C-Language Binding for multi-monitor support
+# libxcb-cursor0: X11 cursor management
+# libdbus-1-3: D-Bus system for Qt IPC
+# libegl1: OpenGL ES rendering
+# libfontconfig1: Font configuration and rendering
 
 # Install PySide6 using pip
 RUN pip3 install pyside6
