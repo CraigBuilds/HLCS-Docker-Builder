@@ -34,9 +34,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Step 2: Set up VirtualBox
-      # GitHub-hosted Ubuntu runners have VirtualBox pre-installed, but we
-      # verify it's available and check the version
+      # Step 2: Install VirtualBox
+      # VirtualBox is not pre-installed on GitHub-hosted Ubuntu runners,
+      # so we need to install it before building the VM
+      - name: Install VirtualBox
+        run: |
+          echo "Installing VirtualBox..."
+          sudo apt-get update
+          sudo apt-get install -y virtualbox virtualbox-dkms
+          echo "VirtualBox installation completed!"
+      
+      # Step 3: Verify VirtualBox installation
+      # Check that VirtualBox was installed correctly and is working
       - name: Verify VirtualBox installation
         run: |
           # Check if VirtualBox is installed and print version
@@ -47,14 +56,14 @@ jobs:
           echo "Available VirtualBox VM types:"
           vboxmanage list ostypes | grep -i ubuntu | head -n 5
       
-      # Step 3: Install Packer
+      # Step 4: Install Packer
       # Using the official HashiCorp setup-packer action
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
         with:
           version: "latest"
       
-      # Step 4: Initialize Packer
+      # Step 5: Initialize Packer
       # Download required Packer plugins specified in the template
       - name: Initialize Packer
         run: |
@@ -65,7 +74,7 @@ jobs:
           echo "Initializing Packer and downloading plugins..."
           packer init ${{ env.PACKER_TEMPLATE }}
       
-      # Step 5: Validate Packer template
+      # Step 6: Validate Packer template
       # Check that the Packer configuration is syntactically correct
       # This catches configuration errors before attempting the build
       - name: Validate Packer template
@@ -78,7 +87,7 @@ jobs:
           
           echo "Packer template validation passed!"
       
-      # Step 6: Build the VM image
+      # Step 7: Build the VM image
       # This is the main build step that creates the VM
       # WARNING: This step can take 20-40 minutes depending on the runner
       # Timeout is set to 60 minutes to prevent indefinite hanging
@@ -103,7 +112,7 @@ jobs:
           
           echo "Packer build completed successfully!"
       
-      # Step 7: Prepare artifacts for upload
+      # Step 8: Prepare artifacts for upload
       # Collect the built VM files for artifact upload and release attachment
       - name: Prepare artifacts
         run: |
@@ -125,7 +134,7 @@ jobs:
           echo "Artifacts prepared for upload:"
           ls -lh vm-artifacts/
       
-      # Step 8: Upload VM image as a workflow artifact
+      # Step 9: Upload VM image as a workflow artifact
       # This makes the VM image downloadable from the GitHub Actions run page
       # Artifacts are retained for 90 days by default
       - name: Upload VM image as artifact
@@ -138,7 +147,7 @@ jobs:
           # Retention period in days (90 is the maximum for free GitHub accounts)
           retention-days: 90
       
-      # Step 9: Create GitHub Release
+      # Step 10: Create GitHub Release
       # Create a release and attach the VM image for every build
       # This provides a permanent download location for the VM
       - name: Create Release and Upload Asset
@@ -213,7 +222,7 @@ jobs:
           
           echo "Release created successfully with VM image attached!"
       
-      # Step 10: Summary
+      # Step 11: Summary
       # Provide a helpful summary at the end of the workflow
       - name: Workflow Summary
         if: always()
