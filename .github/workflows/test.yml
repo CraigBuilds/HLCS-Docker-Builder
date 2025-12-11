@@ -73,8 +73,7 @@ jobs:
           # Test PySide6 import and version
           docker run --rm my-ros2-container:latest bash -c "
             # Verify PySide6 is installed
-            python3 -c 'import PySide6; print(\"PySide6 version:\", PySide6.__version__)' > /tmp/pyside6_version.txt
-            cat /tmp/pyside6_version.txt
+            python3 -c 'import PySide6; print("PySide6 version:", PySide6.__version__)'
             
             # Run the GUI test script with Xvfb (virtual display)
             xvfb-run -a python3 /opt/bootstrap/test_pyside6.py
