@@ -18,13 +18,16 @@ RUN apt-get update && apt-get install -y \
     libdbus-1-3 \
     libegl1 \
     libfontconfig1
-# PySide6/Qt runtime dependencies:
-# xvfb: Virtual X server for headless GUI testing
-# libxcb-xinerama0: X11 protocol C-Language Binding for multi-monitor support
-# libxcb-cursor0: X11 cursor management
-# libdbus-1-3: D-Bus system for Qt IPC
-# libegl1: OpenGL ES rendering
-# libfontconfig1: Font configuration and rendering
+# PySide6/Qt runtime dependencies: 'pip install pyside6' only installs Python bindings and Qt libraries as binary wheels,
+# but these binaries dynamically link to system libraries that must be installed separately via apt.
+# These are platform-specific shared libraries (.so files) that Qt expects to find at runtime:
+# xvfb: Virtual X server for headless GUI testing (allows GUI apps to run without a physical display)
+# libxcb-xinerama0: X11 protocol library for multi-monitor support (Qt's xcb platform plugin requires this)
+# libxcb-cursor0: X11 cursor management library (needed for mouse cursor rendering)
+# libdbus-1-3: D-Bus IPC library (Qt uses D-Bus for system integration like notifications and session management)
+# libegl1: OpenGL ES rendering library (Qt's graphics rendering backend requires EGL for hardware acceleration)
+# libfontconfig1: Font configuration library (Qt needs this to discover and render system fonts)
+# Reference: Qt documentation on Linux/X11 dependencies, PySide6 GitHub issues (#common runtime errors), and testing via ldd on Qt binaries
 
 # Install PySide6 using pip
 RUN pip3 install pyside6
