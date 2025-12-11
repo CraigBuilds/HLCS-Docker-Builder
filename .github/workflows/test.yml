@@ -90,14 +90,25 @@ jobs:
         run: |
           echo "Testing PySide6 GUI functionality with Xvfb..."
           
-          # Run the GUI test script with Xvfb (virtual display)
-          # Using --auto-servernum to automatically find a free display number
-          # Using --server-args to configure X server with minimal settings
+          # Run the GUI test script with manually started Xvfb
+          # This avoids issues with xvfb-run blocking in Docker
           docker run --rm my-ros2-container:latest bash -c "
-            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' python3 /opt/bootstrap/test_pyside6.py
-          " > /tmp/pyside6_gui_output.txt
-          
-          cat /tmp/pyside6_gui_output.txt
+            echo 'Starting Xvfb...'
+            Xvfb :99 -screen 0 1024x768x24 &
+            XVFB_PID=\$!
+            echo 'Xvfb started with PID:' \$XVFB_PID
+            
+            # Wait for Xvfb to be ready
+            sleep 1
+            
+            # Set display and run test
+            export DISPLAY=:99
+            echo 'Running PySide6 test...'
+            python3 -u /opt/bootstrap/test_pyside6.py
+            
+            # Clean up
+            kill \$XVFB_PID 2>/dev/null || true
+          " 2>&1 | tee /tmp/pyside6_gui_output.txt
           
           # Check if test passed
           if grep -q "PySide6 test passed!" /tmp/pyside6_gui_output.txt; then
