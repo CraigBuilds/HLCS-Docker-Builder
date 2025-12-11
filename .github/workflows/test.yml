@@ -87,5 +87,18 @@ jobs:
           else
             echo "✗ PySide6 test failed: Expected output not found"
             cat /tmp/pyside6_output.txt
+            
+      - name: Test asyncua installation
+        run: |
+          echo "Testing asyncua package..."
+          docker run --rm my-ros2-container:latest python3 -c "import asyncua; print('asyncua version:', asyncua.__version__)" > /tmp/asyncua_output.txt
+          
+          # Check if asyncua is installed and can be imported
+          if grep -q "asyncua version:" /tmp/asyncua_output.txt; then
+            echo "✓ asyncua test passed: asyncua is installed and working"
+            cat /tmp/asyncua_output.txt
+          else
+            echo "✗ asyncua test failed: asyncua not found or unexpected output"
+            cat /tmp/asyncua_output.txt
             exit 1
           fi

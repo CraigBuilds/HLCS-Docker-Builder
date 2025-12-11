@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y \
 # Install PySide6 using pip (pinned to version 6.6.1 for reproducible builds)
 RUN pip3 install pyside6==6.6.1
 
+# Install Python packages via pip
+RUN pip3 install asyncua
+
 # Sets /workspace as the working directory for subsequent Dockerfile instructions and for the default shell inside the container. Equivalent to cd /workspace before all future commands.
 RUN mkdir -p /workspace
 WORKDIR /workspace
