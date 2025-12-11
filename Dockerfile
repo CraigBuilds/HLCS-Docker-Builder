@@ -13,20 +13,12 @@ RUN apt-get update && apt-get install -y \
     python3-colcon-common-extensions \
     git \
     xvfb \
-    x11-utils \
     libxcb-xinerama0 \
-    libxcb-icccm4 \
-    libxcb-image0 \
-    libxcb-keysyms1 \
-    libxcb-randr0 \
-    libxcb-render-util0 \
-    libxcb-shape0 \
-    libxkbcommon-x11-0 \
+    libxcb-cursor0 \
     libdbus-1-3 \
     libegl1 \
-    libfontconfig1 \
-    libgl1-mesa-glx \
-    libglib2.0-0
+    libfontconfig1
+# PySide6/Qt runtime dependencies: xvfb (virtual X server for headless GUI testing), libxcb-xinerama0 (X11 protocol C-language Binding for multi-monitor support), libxcb-cursor0 (X11 cursor management), libdbus-1-3 (D-Bus system for Qt IPC), libegl1 (OpenGL ES rendering), libfontconfig1 (font configuration and rendering)
 
 # Install PySide6 using pip
 RUN pip3 install pyside6

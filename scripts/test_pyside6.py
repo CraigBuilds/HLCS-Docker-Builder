@@ -28,10 +28,11 @@ def test_pyside6():
     widget.setLayout(layout)
     print("✓ QWidget and QLabel created successfully")
     
-    # Don't actually show the widget in CI, but verify we can set it up
-    # widget.show()
+    # Show the widget to verify full GUI stack (runs in virtual display via Xvfb)
+    widget.show()
+    print("✓ Widget shown successfully")
     
-    # Exit immediately after setup verification
+    # Exit immediately after showing
     QTimer.singleShot(0, app.quit)
     
     # Run the event loop briefly
