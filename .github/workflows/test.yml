@@ -98,16 +98,28 @@ jobs:
             XVFB_PID=\$!
             echo 'Xvfb started with PID:' \$XVFB_PID
             
-            # Wait for Xvfb to be ready
-            sleep 1
+            # Wait for Xvfb to be ready (check if display is available)
+            for i in \$(seq 1 10); do
+              if xdpyinfo -display :99 >/dev/null 2>&1; then
+                echo 'Xvfb is ready'
+                break
+              fi
+              echo 'Waiting for Xvfb...'
+              sleep 0.5
+            done
             
             # Set display and run test
             export DISPLAY=:99
             echo 'Running PySide6 test...'
             python3 -u /opt/bootstrap/test_pyside6.py
+            EXIT_CODE=\$?
             
-            # Clean up
+            # Clean up - try graceful kill first, then force kill if needed
             kill \$XVFB_PID 2>/dev/null || true
+            sleep 0.5
+            kill -9 \$XVFB_PID 2>/dev/null || true
+            
+            exit \$EXIT_CODE
           " 2>&1 | tee /tmp/pyside6_gui_output.txt
           
           # Check if test passed
