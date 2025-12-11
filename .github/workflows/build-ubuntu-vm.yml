@@ -40,8 +40,8 @@ jobs:
       - name: Install VirtualBox
         run: |
           echo "Installing VirtualBox..."
-          sudo apt-get update
-          sudo apt-get install -y virtualbox virtualbox-dkms
+          sudo apt-get update || { echo "Failed to update apt repositories"; exit 1; }
+          sudo apt-get install -y virtualbox virtualbox-dkms || { echo "Failed to install VirtualBox"; exit 1; }
           echo "VirtualBox installation completed!"
       
       # Step 3: Verify VirtualBox installation
