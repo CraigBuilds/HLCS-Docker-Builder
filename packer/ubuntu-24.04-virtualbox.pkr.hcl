@@ -41,14 +41,14 @@ variable "iso_url" {
   type        = string
   description = "URL to download the Ubuntu 24.04 LTS server ISO"
   # Using the official Ubuntu server ISO for 24.04 LTS (Noble Numbat)
-  default     = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
+  default     = "https://releases.ubuntu.com/noble/ubuntu-24.04.3-live-server-amd64.iso"
 }
 
 variable "iso_checksum" {
   type        = string
   description = "SHA256 checksum of the Ubuntu ISO for verification"
   # This checksum ensures the downloaded ISO hasn't been tampered with
-  default     = "sha256:e240e4b801f7bb68c20d1356b60968ad0c33a41d00d828e74ceb3364a0317be9"
+  default     = "sha256:c3514bf0056180d09376462a7a1b4f213c1d6e8ea67fae5c25099c6fd3d8274b"
 }
 
 variable "ssh_username" {
