@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y \
     python3-colcon-common-extensions \
     git
 
+# Install Python packages via pip
+RUN pip3 install asyncua
+
 # Sets /workspace as the working directory for subsequent Dockerfile instructions and for the default shell inside the container. Equivalent to cd /workspace before all future commands.
 RUN mkdir -p /workspace
 WORKDIR /workspace
