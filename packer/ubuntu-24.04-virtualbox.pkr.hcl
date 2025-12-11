@@ -115,10 +115,10 @@ source "virtualbox-iso" "ubuntu" {
   # This allows running provisioning scripts inside the VM
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
-  # SSH timeout covers: Ubuntu autoinstall (5-8 min: partitioning, package installation),
+  # SSH timeout covers: Ubuntu autoinstall (8-12 min in CI: partitioning, package installation),
   # system reboot, SSH service startup, and network configuration. 
-  # 10m is reasonable for automated installs; fails faster than the original 20m if issues occur.
-  ssh_timeout          = "10m"  # Maximum time to wait for SSH to become available
+  # 20m provides adequate time for autoinstall to complete in GitHub Actions environment.
+  ssh_timeout          = "20m"  # Maximum time to wait for SSH to become available
   ssh_handshake_attempts = 100  # Number of SSH connection attempts
   ssh_wait_timeout     = "10m"  # Additional timeout for SSH to be ready after connection
   
