@@ -66,6 +66,31 @@ jobs:
           docker run --rm my-ros2-container:latest bash -c "echo 'Container is running' && test -d /workspace && ls -la /workspace"
           echo "✓ Container run test passed: Container can execute commands successfully"
 
+      - name: Test PySide6 installation
+        timeout-minutes: 5
+        run: |
+          echo "Testing PySide6 installation..."
+          
+          # Test PySide6 import and version
+          docker run --rm my-ros2-container:latest bash -c "
+            # Verify PySide6 is installed
+            python3 -c 'import PySide6; print(\"PySide6 version:\", PySide6.__version__)'
+            
+            # Run the GUI test script with Xvfb (virtual display)
+            xvfb-run -a python3 /opt/bootstrap/test_pyside6.py
+          " > /tmp/pyside6_output.txt
+          
+          cat /tmp/pyside6_output.txt
+          
+          # Check if test passed
+          if grep -q "PySide6 test passed!" /tmp/pyside6_output.txt; then
+            echo "✓ PySide6 test passed: PySide6 is installed and can create GUI applications"
+          else
+            echo "✗ PySide6 test failed: Expected output not found"
+            cat /tmp/pyside6_output.txt
+            exit 1
+          fi
+            
       - name: Test asyncua installation
         run: |
           echo "Testing asyncua package..."
