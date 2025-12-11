@@ -1,17 +1,11 @@
 name: Build Ubuntu 24.04 VirtualBox VM
 
 # Workflow triggers
-# This workflow can be triggered in two ways:
+# This workflow is triggered manually via GitHub Actions UI
 on:
-  # 1. Manual trigger via GitHub Actions UI (workflow_dispatch)
-  #    Allows manually starting the build from the Actions tab
+  # Manual trigger via GitHub Actions UI (workflow_dispatch)
+  # Allows manually starting the build from the Actions tab
   workflow_dispatch:
-  
-  # 2. Automatic trigger on pushes to the main branch
-  #    Automatically builds when changes are pushed to main
-  push:
-    branches:
-      - main
 
 # Environment variables used throughout the workflow
 env:
@@ -25,15 +19,7 @@ env:
 jobs:
   build-vm:
     # Runner configuration
-    # IMPORTANT: This workflow requires VirtualBox and Packer to be available
-    # 
-    # Option 1: Use a self-hosted runner with VirtualBox pre-installed
-    #           Uncomment the line below and comment out the ubuntu-latest line
-    # runs-on: self-hosted
-    #
-    # Option 2: Use GitHub-hosted runner (ubuntu-latest)
-    #           VirtualBox is pre-installed on GitHub-hosted Ubuntu runners
-    #           This is the default option for convenience
+    # VirtualBox is pre-installed on GitHub-hosted Ubuntu runners
     runs-on: ubuntu-latest
     
     # Permissions required for this job
@@ -62,29 +48,11 @@ jobs:
           vboxmanage list ostypes | grep -i ubuntu | head -n 5
       
       # Step 3: Install Packer
-      # Download and install HashiCorp Packer from the official repository
-      - name: Install Packer
-        run: |
-          # Download HashiCorp GPG key for package verification
-          echo "Adding HashiCorp GPG key..."
-          wget -O- https://apt.releases.hashicorp.com/gpg | \
-            gpg --dearmor | \
-            sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
-          
-          # Add HashiCorp repository to apt sources
-          echo "Adding HashiCorp repository..."
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
-            https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
-            sudo tee /etc/apt/sources.list.d/hashicorp.list
-          
-          # Update package lists and install Packer
-          echo "Installing Packer..."
-          sudo apt-get update
-          sudo apt-get install -y packer
-          
-          # Verify Packer installation and print version
-          echo "Packer installed successfully:"
-          packer version
+      # Using the official HashiCorp setup-packer action
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        with:
+          version: "latest"
       
       # Step 4: Initialize Packer
       # Download required Packer plugins specified in the template
@@ -170,21 +138,30 @@ jobs:
           # Retention period in days (90 is the maximum for free GitHub accounts)
           retention-days: 90
       
-      # Step 9: Create GitHub Release (only for tagged builds)
-      # When a tag is pushed, create a release and attach the VM image
-      # This provides a permanent, versioned download location for the VM
+      # Step 9: Create GitHub Release
+      # Create a release and attach the VM image for every build
+      # This provides a permanent download location for the VM
       - name: Create Release and Upload Asset
-        # Only run this step if the workflow was triggered by a tag push
-        # Tags should follow the convention: v1.0.0, v1.1.0, etc.
-        if: startsWith(github.ref, 'refs/tags/')
         env:
           # GitHub token for authentication (automatically provided by GitHub Actions)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Extract the tag name from the git reference
-          # refs/tags/v1.0.0 -> v1.0.0
-          TAG_NAME=${GITHUB_REF#refs/tags/}
-          echo "Creating release for tag: $TAG_NAME"
+          # Generate a release name based on the workflow run
+          # Use tag if available, otherwise use run number and timestamp
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # Extract the tag name from the git reference
+            # refs/tags/v1.0.0 -> v1.0.0
+            RELEASE_NAME=${GITHUB_REF#refs/tags/}
+            RELEASE_TAG="$RELEASE_NAME"
+          else
+            # For non-tagged builds, create a unique release name
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+            RELEASE_TAG="build-${{ github.run_number }}-${TIMESTAMP}"
+            RELEASE_NAME="Build #${{ github.run_number }} - ${TIMESTAMP}"
+          fi
+          
+          echo "Creating release: $RELEASE_NAME"
+          echo "Release tag: $RELEASE_TAG"
           
           # Find the OVA file to attach to the release
           OVA_FILE=$(find vm-artifacts -name "*.ova" | head -n 1)
@@ -198,11 +175,11 @@ jobs:
           
           # Create a GitHub release using the GitHub CLI
           # The release includes:
-          # - Title: The tag name
+          # - Title: The release name
           # - Notes: Description of the VM and installation instructions
           # - Asset: The VM OVA file
-          gh release create "$TAG_NAME" \
-            --title "Ubuntu 24.04 VirtualBox VM - $TAG_NAME" \
+          gh release create "$RELEASE_TAG" \
+            --title "Ubuntu 24.04 VirtualBox VM - $RELEASE_NAME" \
             --notes "## Ubuntu 24.04 LTS VirtualBox VM Image
 
           This release contains a pre-built VirtualBox VM image with:
@@ -251,7 +228,7 @@ jobs:
             echo ""
             echo "Download options:"
             echo "1. Workflow artifact: Click the 'ubuntu-24.04-virtualbox-vm' artifact above"
-            echo "2. Release asset: If this was a tagged build, find the release in the Releases section"
+            echo "2. Release asset: Check the Releases section for this build's release"
             echo ""
             echo "VM Details:"
             echo "- OS: Ubuntu 24.04 LTS"

@@ -92,7 +92,7 @@ The GitHub Actions workflow handles all prerequisites automatically when using G
 
 ### How to Trigger a VM Build
 
-#### Option 1: Manual Workflow Dispatch
+The workflow is triggered manually via the GitHub Actions UI:
 
 1. Go to the [Actions tab](../../actions/workflows/build-ubuntu-vm.yml)
 2. Click "Run workflow"
@@ -101,31 +101,11 @@ The GitHub Actions workflow handles all prerequisites automatically when using G
 
 The build takes approximately 20-40 minutes to complete.
 
-#### Option 2: Automatic Build on Push
-
-The workflow automatically triggers when changes are pushed to the `main` branch.
-
-#### Option 3: Create a Release Build
-
-To create a versioned release with the VM image attached as a release asset:
-
-1. Create and push a tag with semantic versioning:
-   ```bash
-   git tag -a v1.0.0 -m "Release version 1.0.0"
-   git push origin v1.0.0
-   ```
-
-2. The workflow will automatically:
-   - Build the VM image
-   - Create a GitHub Release for the tag
-   - Attach the VM OVA file as a release asset
-   - Generate release notes with usage instructions
-
-**Tag Naming Convention**: Use semantic versioning (e.g., `v1.0.0`, `v1.1.0`, `v2.0.0`)
+**Note**: Every workflow run creates a GitHub Release with the VM image attached. Releases are automatically named using the build number and timestamp (e.g., "Build #5 - 20231211-143022"). If you push a tag before running the workflow, the release will use the tag name instead.
 
 ### Where to Download the VM
 
-#### From Workflow Artifacts (All Builds)
+#### From Workflow Artifacts
 
 1. Go to the [Actions tab](../../actions/workflows/build-ubuntu-vm.yml)
 2. Click on a completed workflow run
@@ -135,10 +115,12 @@ To create a versioned release with the VM image attached as a release asset:
 
 **Note**: Artifacts are retained for 90 days.
 
-#### From Releases (Tagged Builds Only)
+#### From Releases
+
+Every workflow run creates a GitHub Release with the VM image attached:
 
 1. Go to the [Releases page](../../releases)
-2. Find the release version you want
+2. Find the release you want (tagged releases like "v1.0.0" or auto-generated like "Build #5")
 3. Download the `.ova` file from the "Assets" section
 
 **Note**: Release assets are retained permanently.
