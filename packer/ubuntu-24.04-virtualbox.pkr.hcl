@@ -124,13 +124,15 @@ source "virtualbox-iso" "ubuntu" {
   # It configures the kernel to use our autoinstall configuration
   boot_command = [
     # Wait for GRUB menu to appear and be ready
-    "<wait><wait><wait>",
+    # Using explicit wait time for more predictable behavior
+    "<wait5>",
     # Press 'c' to enter GRUB command line mode (more reliable than editing)
     "c<wait>",
     # Set the kernel boot parameters for autoinstall
     # - autoinstall: enables Ubuntu's automated installation
     # - ds=nocloud-net: tells cloud-init to look for config on the network/http server
     # - s=http://{{.HTTPIP}}:{{.HTTPPort}}/: URL where Packer serves our user-data/meta-data
+    # The '---' separator is required by Ubuntu 24.04 to properly parse autoinstall parameters
     "linux /casper/vmlinuz autoinstall ds=nocloud-net\\;s=http://{{.HTTPIP}}:{{.HTTPPort}}/ ---<enter>",
     # Load the initial ramdisk
     "initrd /casper/initrd<enter>",
