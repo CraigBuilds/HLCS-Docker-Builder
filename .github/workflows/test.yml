@@ -66,28 +66,68 @@ jobs:
           docker run --rm my-ros2-container:latest bash -c "echo 'Container is running' && test -d /workspace && ls -la /workspace"
           echo "✓ Container run test passed: Container can execute commands successfully"
 
-      - name: Test PySide6 installation
-        timeout-minutes: 5
+      - name: Test PySide6 import
+        timeout-minutes: 2
         run: |
-          echo "Testing PySide6 installation..."
-          
-          # Test PySide6 import and version
+          echo "Testing PySide6 import and version..."
           docker run --rm my-ros2-container:latest bash -c "
-            # Verify PySide6 is installed
             python3 -c 'import PySide6; print(\"PySide6 version:\", PySide6.__version__)'
-            
-            # Run the GUI test script with Xvfb (virtual display)
-            xvfb-run -a python3 /opt/bootstrap/test_pyside6.py
-          " > /tmp/pyside6_output.txt
+          " > /tmp/pyside6_import_output.txt
           
-          cat /tmp/pyside6_output.txt
+          cat /tmp/pyside6_import_output.txt
+          
+          # Check if PySide6 is installed
+          if grep -q "PySide6 version:" /tmp/pyside6_import_output.txt; then
+            echo "✓ PySide6 import test passed: PySide6 is installed"
+          else
+            echo "✗ PySide6 import test failed: PySide6 not found"
+            cat /tmp/pyside6_import_output.txt
+            exit 1
+          fi
+
+      - name: Test PySide6 GUI functionality
+        timeout-minutes: 2
+        run: |
+          echo "Testing PySide6 GUI functionality with Xvfb..."
+          
+          # Run the GUI test script with manually started Xvfb
+          # This avoids issues with xvfb-run blocking in Docker
+          docker run --rm my-ros2-container:latest bash -c "
+            echo 'Starting Xvfb...'
+            Xvfb :99 -screen 0 1024x768x24 &
+            XVFB_PID=\$!
+            echo 'Xvfb started with PID:' \$XVFB_PID
+            
+            # Wait for Xvfb to be ready (check if display is available)
+            for i in \$(seq 1 10); do
+              if xdpyinfo -display :99 >/dev/null 2>&1; then
+                echo 'Xvfb is ready'
+                break
+              fi
+              echo 'Waiting for Xvfb...'
+              sleep 0.5
+            done
+            
+            # Set display and run test
+            export DISPLAY=:99
+            echo 'Running PySide6 test...'
+            python3 -u /opt/bootstrap/test_pyside6.py
+            EXIT_CODE=\$?
+            
+            # Clean up - try graceful kill first, then force kill if needed
+            kill \$XVFB_PID 2>/dev/null || true
+            sleep 0.5
+            kill -9 \$XVFB_PID 2>/dev/null || true
+            
+            exit \$EXIT_CODE
+          " 2>&1 | tee /tmp/pyside6_gui_output.txt
           
           # Check if test passed
-          if grep -q "PySide6 test passed!" /tmp/pyside6_output.txt; then
-            echo "✓ PySide6 test passed: PySide6 is installed and can create GUI applications"
+          if grep -q "PySide6 test passed!" /tmp/pyside6_gui_output.txt; then
+            echo "✓ PySide6 GUI test passed: PySide6 can create GUI applications"
           else
-            echo "✗ PySide6 test failed: Expected output not found"
-            cat /tmp/pyside6_output.txt
+            echo "✗ PySide6 GUI test failed: Expected output not found"
+            cat /tmp/pyside6_gui_output.txt
             exit 1
           fi
             
