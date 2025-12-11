@@ -29,8 +29,8 @@ RUN apt-get update && apt-get install -y \
 # libfontconfig1: Font configuration library (Qt needs this to discover and render system fonts)
 # Reference: Qt documentation on Linux/X11 dependencies, PySide6 GitHub issues (#common runtime errors), and testing via ldd on Qt binaries
 
-# Install PySide6 using pip
-RUN pip3 install pyside6
+# Install PySide6 using pip (pinned to version 6.6.1 for reproducible builds)
+RUN pip3 install pyside6==6.6.1
 
 # Sets /workspace as the working directory for subsequent Dockerfile instructions and for the default shell inside the container. Equivalent to cd /workspace before all future commands.
 RUN mkdir -p /workspace
