@@ -11,7 +11,25 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-colcon-common-extensions \
-    git
+    git \
+    xvfb \
+    x11-utils \
+    libxcb-xinerama0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-randr0 \
+    libxcb-render-util0 \
+    libxcb-shape0 \
+    libxkbcommon-x11-0 \
+    libdbus-1-3 \
+    libegl1 \
+    libfontconfig1 \
+    libgl1-mesa-glx \
+    libglib2.0-0
+
+# Install PySide6 using pip
+RUN pip3 install pyside6
 
 # Sets /workspace as the working directory for subsequent Dockerfile instructions and for the default shell inside the container. Equivalent to cd /workspace before all future commands.
 RUN mkdir -p /workspace
@@ -27,6 +45,10 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 # chmod +x install_host_tools.sh && ./install_host_tools.sh
 COPY scripts/install_host_tools.sh /opt/bootstrap/install_host_tools.sh
 RUN chmod +x /opt/bootstrap/install_host_tools.sh
+
+# Add PySide6 test script for validation
+COPY scripts/test_pyside6.py /opt/bootstrap/test_pyside6.py
+RUN chmod +x /opt/bootstrap/test_pyside6.py
 
 # Default command
 CMD ["/bin/bash"]
