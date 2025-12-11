@@ -32,8 +32,9 @@ def test_pyside6():
     widget.show()
     print("✓ Widget shown successfully")
     
-    # Exit immediately after showing
-    QTimer.singleShot(0, app.quit)
+    # Schedule quit before starting event loop to prevent hanging
+    # Using 100ms delay to ensure widget is processed
+    QTimer.singleShot(100, app.quit)
     
     # Run the event loop briefly
     app.exec()

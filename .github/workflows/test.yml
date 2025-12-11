@@ -67,6 +67,7 @@ jobs:
           echo "✓ Container run test passed: Container can execute commands successfully"
 
       - name: Test PySide6 installation
+        timeout-minutes: 5
         run: |
           echo "Testing PySide6 installation..."
           
