@@ -101,6 +101,8 @@ systemctl enable docker
 
 # Verify Docker installation by running the hello-world container
 # This is a simple test to confirm Docker is working correctly
+# Note: This step adds ~10-20 seconds to build time but provides confidence
+# that Docker is properly configured. Comment out if build time is critical.
 echo "Verifying Docker installation..."
 docker run --rm hello-world
 

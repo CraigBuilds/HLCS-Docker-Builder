@@ -55,7 +55,9 @@ autoinstall:
     username: packer
     # Password hash for the user (password: "packer")
     # Generated using: mkpasswd -m sha-512 --rounds=4096
-    # In production, use a strong password or SSH keys instead
+    # SECURITY WARNING: This is a weak default password for development/demo purposes only
+    # Users MUST change this password immediately after first login
+    # In production environments, use a strong password or SSH keys instead
     password: "$6$rounds=4096$SaltySalt$pZzsKDgUJWHqFSLf.Wh0EhRJpODkKPQKMmUqpPSNpM6SuHcA8xCeHN8/rU9tD3SyPRVyFCKLjSxHrHkQdqGcn1"
     # Add user to sudo group for administrative tasks
     # groups: [adm, sudo] creates user with sudo privileges
@@ -85,7 +87,10 @@ autoinstall:
     
     # Configure sudo to not require a password for the packer user
     # This is needed for Packer provisioners to run sudo commands non-interactively
-    # SECURITY NOTE: In production, you may want to require passwords for sudo
+    # during the build process. It also makes the development VM more convenient to use.
+    # SECURITY WARNING: This is appropriate for development VMs but not for production
+    # In production environments, require passwords for sudo by removing this config
+    # or editing /etc/sudoers.d/packer after deployment
     - "echo 'packer ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/packer"
     
     # Set correct permissions on the sudoers file

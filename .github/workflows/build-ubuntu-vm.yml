@@ -113,7 +113,9 @@ jobs:
       # Step 6: Build the VM image
       # This is the main build step that creates the VM
       # WARNING: This step can take 20-40 minutes depending on the runner
+      # Timeout is set to 60 minutes to prevent indefinite hanging
       - name: Build VM with Packer
+        timeout-minutes: 60
         run: |
           cd ${{ env.PACKER_DIR }}
           
