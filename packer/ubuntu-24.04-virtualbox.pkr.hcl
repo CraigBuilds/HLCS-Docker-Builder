@@ -106,33 +106,41 @@ source "virtualbox-iso" "ubuntu" {
   # This is essential for automated CI/CD builds
   headless             = true
   
+  # Boot wait time - wait for GRUB menu to be ready before sending boot commands
+  # This prevents commands from being sent too early and potentially being missed
+  boot_wait            = "5s"
+  
   # SSH communicator configuration
   # Packer will use SSH to connect to the VM after installation completes
   # This allows running provisioning scripts inside the VM
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
-  ssh_timeout          = "20m"  # Maximum time to wait for SSH to become available
+  # SSH timeout covers: Ubuntu autoinstall (5-8 min: partitioning, package installation),
+  # system reboot, SSH service startup, and network configuration. 
+  # 10m is reasonable for automated installs; fails faster than the original 20m if issues occur.
+  ssh_timeout          = "10m"  # Maximum time to wait for SSH to become available
   ssh_handshake_attempts = 100  # Number of SSH connection attempts
+  ssh_wait_timeout     = "10m"  # Additional timeout for SSH to be ready after connection
   
   # Boot configuration for automated installation
   # The boot_command is sent to the VM as keyboard input during boot
   # It configures the kernel to use our autoinstall configuration
   boot_command = [
-    # Wait for GRUB menu to appear
-    "<wait>",
-    # Select the first option and press 'e' to edit boot parameters
-    "e<wait>",
-    # Navigate to the linux line
-    "<down><down><down>",
-    # Go to end of line
-    "<end>",
-    # Add autoinstall kernel parameters:
+    # Wait for GRUB menu to appear and be ready
+    # Using explicit wait time for more predictable behavior
+    "<wait5>",
+    # Press 'c' to enter GRUB command line mode (more reliable than editing)
+    "c<wait>",
+    # Set the kernel boot parameters for autoinstall
     # - autoinstall: enables Ubuntu's automated installation
     # - ds=nocloud-net: tells cloud-init to look for config on the network/http server
     # - s=http://{{.HTTPIP}}:{{.HTTPPort}}/: URL where Packer serves our user-data/meta-data
-    " autoinstall ds=nocloud-net\\;s=http://{{.HTTPIP}}:{{.HTTPPort}}/",
+    # The '---' separator is required by Ubuntu 24.04 to properly parse autoinstall parameters
+    "linux /casper/vmlinuz autoinstall ds=nocloud-net\\;s=http://{{.HTTPIP}}:{{.HTTPPort}}/ ---<enter>",
+    # Load the initial ramdisk
+    "initrd /casper/initrd<enter>",
     # Boot with these parameters
-    "<f10>"
+    "boot<enter>"
   ]
   
   # HTTP server configuration

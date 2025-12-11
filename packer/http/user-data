@@ -62,21 +62,28 @@ autoinstall:
     # Add user to sudo group for administrative tasks
     # groups: [adm, sudo] creates user with sudo privileges
   
-  # Package configuration
+  # Package configuration and installation
   # Update all packages to latest versions after installation
-  packages:
-    update: true
-    upgrade: true
-  
-  # Additional packages to install during the base installation
-  # We install minimal packages here; Docker and VS Code will be installed
-  # by the Packer provisioning script for better control and documentation
+  # and install essential packages for the base system
   packages:
     - openssh-server  # Ensure SSH server is installed (should be included by ssh config)
     - curl  # Utility for downloading files
     - wget  # Alternative download utility
     - git  # Version control system
     - build-essential  # Basic compilation tools (gcc, make, etc.)
+  
+  # Package update settings
+  # Update package lists and upgrade packages during installation
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64]
+        uri: http://archive.ubuntu.com/ubuntu
+  
+  # Update and upgrade packages during installation
+  package_update: true
+  package_upgrade: true
   
   # Late commands - run after installation completes but before first boot
   # These commands run in the installer environment, not the installed system
